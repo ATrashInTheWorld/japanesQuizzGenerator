@@ -50,7 +50,7 @@ class Word(Element):
 Kanji: extends Element. holds kanji and its readings
 '''
 class Kanji(Element):
-    def __init__(self, kanji, onr, kunr):
+    def __init__(self, kanji, kunr, onr):
         self.kanji = kanji
         self.onr = onr
         self.kunr = kunr
@@ -59,10 +59,10 @@ class Kanji(Element):
         return self.kanji
 
     def getOnr(self):
-        return self.onr
+        return self.onr.split(';')
 
     def getKunr(self):
-        return self.kunr
+        return self.kunr.split(';')
 
     def setKanji(self, kanji):
         self.kanji = kanji
@@ -72,3 +72,13 @@ class Kanji(Element):
 
     def setKunr(self, kunr):
         self.kunr = kunr
+    
+    def toString(self):
+        kanjiVals = self.kanji+"   Kunyomi:"
+        for kunr in self.kunr.split(';'):
+            kanjiVals +=" -"+kunr
+        kanjiVals += "   Onyomi"
+        for onr in self.onr.split(';'):
+            kanjiVals +=" -"+onr
+
+        return kanjiVals

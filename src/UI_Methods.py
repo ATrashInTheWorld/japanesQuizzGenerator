@@ -1,14 +1,13 @@
-def generateNewQuizz():
-    print("new Quizz generation")
+def saveDiscarToolbar(button):
+    if button == "Save to new file":
+        saveToFile()
+    elif button == "Discar and Close":
+        discarClose()
 
-def createKanjiBank():
-    print("create Kanji Bank")
 
-def createWordsBank():
-    print("create Words Bank")
+def saveToFile():
+    print("will save")
 
-def createElementsBank():
-    print("create elements Bank")
+def discarClose():
+    print("discar close")
 
-def modifyExistingBank():
-    print("modifiyng word Bank")
