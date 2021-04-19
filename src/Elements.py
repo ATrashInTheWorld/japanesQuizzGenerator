@@ -45,18 +45,26 @@ class Word(Element):
     def setDefinition(self, definition):
         self.definition = definition
 
+    def toString(self):
+        wordVals = self.word+"   Reading: "+self.reading+"   Definition: "+self.definition
+        return wordVals
+
 
 '''
 Kanji: extends Element. holds kanji and its readings
 '''
 class Kanji(Element):
-    def __init__(self, kanji, kunr, onr):
+    def __init__(self, kanji, meanings, kunr, onr):
         self.kanji = kanji
+        self.meanings = meanings
         self.onr = onr
         self.kunr = kunr
 
     def getKanji(self):
         return self.kanji
+
+    def getMeanings(self):
+        return self.meanings.split(';')
 
     def getOnr(self):
         return self.onr.split(';')
@@ -74,7 +82,10 @@ class Kanji(Element):
         self.kunr = kunr
     
     def toString(self):
-        kanjiVals = self.kanji+"   Kunyomi:"
+        kanjiVals = self.kanji+"   Meaning: "
+        for mean in self.meanings.split(';'):
+            kanjiVals +=" -"+mean
+        kanjiVals+="   Kunyomi:"
         for kunr in self.kunr.split(';'):
             kanjiVals +=" -"+kunr
         kanjiVals += "   Onyomi"
