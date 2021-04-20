@@ -21,17 +21,17 @@ class Application(tk.Tk):
         welcome_label = tk.Label(self, text = "Japanese Quizz Generator", font=10)
         welcome_label.pack(padx = 3, pady = 3)
 
-        generateQuizz_button = tk.Button(self, text ="Generate new Quizz", command = generateNewQuizz)
-        generateQuizz_button.pack(padx= 5, pady = 5)
+        generateKanjiQuizz_button = tk.Button(self, text ="Generate new Kanji Quizz", command = lambda: generateNewQuizz("kanji"))
+        generateKanjiQuizz_button.pack(padx= 5, pady = 5)
+
+        generateWordQuizz_button = tk.Button(self, text ="Generate new Word Quizz", command = lambda: generateNewQuizz("word"))
+        generateWordQuizz_button.pack(padx= 5, pady = 5)
         
         newKanjiBank_button = tk.Button(self, text="Create new Kanji bank", command=createNewKanjiBank)
         newKanjiBank_button.pack(padx=5, pady=5)
         
         newWordBank_button = tk.Button(self, text="Create new Word Bank", command=createNewWordBank)
         newWordBank_button.pack(padx=5, pady=5)
-
-        newElemsBank_button = tk.Button(self, text="Create new Bank of Elements", command=createNewElemBank)
-        newElemsBank_button.pack(padx=5, pady=5)
 
         modifyBank_button = tk.Button(self, text="Modify an existing bank", command=modifyBank)
         modifyBank_button.pack(padx=5, pady=5)
@@ -211,9 +211,23 @@ def saveBank(elemType):
 
 
 ################################ QUIZZ related ############################
-def generateNewQuizz():
-    # x = Application.first_entry.get()
-    print("Generating new quizz")
+def generateNewQuizz(quizzType):
+    print("Generating new quizz   "+quizzType)
+    '''
+    Will open a new window that is identical for both, where user can select from 
+    fileS to be tested. It can also delete an oppend file,clear all files like the Banks
+    Then depending on the type selected, it will have to check if the quizzType 
+    is the same as the file type selected, cannot have kanji and words at the same time
+    
+    Once all the wanted files selected, he will press a button that open another window that 
+    will display all the elements he will be tested on, they will all be checked by default.
+    Buttons(selecteAll, deselectAll, generateQuizz)
+    He will have to choose which is the question (one of the attributes) and selected what
+    the multiple choices will be (another attribute of the element)
+    He will press a button GenerateQuizz and it will open an html page with the quizz that will 
+    validate it. Everytime he presses the GenerateQuizz button another random quizz will be generated
+    on the Webpage. User will validate in Webpage and will have possibility to save it in PDF.
+    '''
 
 ################################ KANJI bank related ############################
 def createNewKanjiBank():
