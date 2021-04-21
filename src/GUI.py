@@ -21,10 +21,10 @@ class Application(tk.Tk):
         welcome_label = tk.Label(self, text = "Japanese Quizz Generator", font=10)
         welcome_label.pack(padx = 3, pady = 3)
 
-        generateKanjiQuizz_button = tk.Button(self, text ="Generate new Kanji Quizz", command = lambda: generateNewQuizz("kanji"))
+        generateKanjiQuizz_button = tk.Button(self, text ="Generate new Kanji Quizz", command = lambda: generateNewQuizz("kanjis"))
         generateKanjiQuizz_button.pack(padx= 5, pady = 5)
 
-        generateWordQuizz_button = tk.Button(self, text ="Generate new Word Quizz", command = lambda: generateNewQuizz("word"))
+        generateWordQuizz_button = tk.Button(self, text ="Generate new Word Quizz", command = lambda: generateNewQuizz("words"))
         generateWordQuizz_button.pack(padx= 5, pady = 5)
         
         newKanjiBank_button = tk.Button(self, text="Create new Kanji bank", command=createNewKanjiBank)
@@ -190,16 +190,237 @@ class WordForm(tk.Toplevel):
         addToList_button.grid(row=3,column=1)
 
 
+class QuizzFileSelection(tk.Toplevel):
+    def __init__(self, quizzType):
+        tk.Toplevel.__init__(self)
+        self.geometry('600x350')
+        self.title("Quizz Files Selection")
+
+        #TODO Remove and empty this list
+        # QuizzFileSelection.files_list = ["/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta2.json"]
+        QuizzFileSelection.files_list = []
+        QuizzFileSelection.quizz_type = quizzType
+
+        warning_label = tk.Label(self, text="Words and Kanji bank cannot be mixed.\nThe fille will be added, but the content will not be included.")
+        warning_label.pack()
+
+        QuizzFileSelection.add_file_button = tk.Button(self, text="Add a file", command=QuizzFileSelection.addFile)
+        QuizzFileSelection.add_file_button.pack()
+
+        QuizzFileSelection.remove_file_button = tk.Button(self, text="Remove Selected File", command=QuizzFileSelection.removeSelectedFile)
+        QuizzFileSelection.remove_file_button.pack()
+
+        QuizzFileSelection.clearall_file_button = tk.Button(self, text="Clear All Files", command=QuizzFileSelection.clearAllFiles)
+        QuizzFileSelection.clearall_file_button.pack()
+
+        QuizzFileSelection.setup_quizz_button = tk.Button(self, text="Setup Quizz", command=QuizzFileSelection.setupQuizz)
+        QuizzFileSelection.setup_quizz_button.pack()
+
+        QuizzFileSelection.fileScroll = tk.Scrollbar(self)
+        QuizzFileSelection.fileScroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        QuizzFileSelection.fileList = tk.Listbox(self, yscrollcommand = self.fileScroll.set)
+
+        QuizzFileSelection.fileList.pack(fill=tk.BOTH)
+        QuizzFileSelection.fileScroll.config(command=self.fileList.yview)
+
+    def refreshFilesList():
+        QuizzFileSelection.fileList.delete(0, tk.END)
+        i = 1
+        for fileName in QuizzFileSelection.files_list:
+            QuizzFileSelection.fileList.insert(tk.END, str(i)+". "+fileName)
+            i +=1
+
+    def addFile():
+        fileName = tk.filedialog.askopenfilename()
+        if fileName:
+            QuizzFileSelection.files_list.append(fileName)
+            QuizzFileSelection.refreshFilesList()
+    
+    def removeSelectedFile():
+        if len(QuizzFileSelection.fileList.curselection()) != 0:
+            del QuizzFileSelection.files_list[QuizzFileSelection.fileList.curselection()[0]]
+            QuizzFileSelection.refreshFilesList()
+
+    def clearAllFiles():
+        QuizzFileSelection.files_list.clear()
+        QuizzFileSelection.refreshFilesList()
+
+    def setupQuizz():
+        elements_list = []
+        for fileName in QuizzFileSelection.files_list:
+                elements = open(fileName, encoding='utf8')
+                data = json.load(elements)
+                if list(data.keys())[0] == "kanjis" and QuizzFileSelection.quizz_type=="kanjis":
+                    for element in data[QuizzFileSelection.quizz_type]:
+                        kanji = list(element.keys())[0]
+                        meanings = ';'.join(element[kanji]["Meanings"])
+                        kunyomi = ';'.join(element[kanji]["Kunyomi"])
+                        onyomi = ';'.join(element[kanji]["Onyomi"])
+                        elements_list.append(elems.Kanji(kanji, meanings, kunyomi, onyomi))
+
+                elif list(data.keys())[0] == "words" and QuizzFileSelection.quizz_type=="words":
+                    for element in data[QuizzFileSelection.quizz_type]:
+                        word = list(element.keys())[0]
+                        elements_list.append(elems.Word(word, element[word]["Reading"], element[word]["Definition"]))
+
+        QuizzGenerator(QuizzFileSelection.quizz_type, elements_list)
+
+## Quizz generation
+class QuizzGenerator(tk.Toplevel):
+    def __init__(self, quizzType, elements):
+        tk.Toplevel.__init__(self)
+        self.geometry('700x650')
+        self.title("Quizz Generator")
+
+        QuizzGenerator.quizz_type = quizzType
+        QuizzGenerator.selected = elements
+        QuizzGenerator.unselected = []
+
+        QuizzGenerator.move_selected = tk.Button(self, text="Move selected", command=QuizzGenerator.moveSelected)
+        QuizzGenerator.move_selected.pack()
+
+        QuizzGenerator.select_all = tk.Button(self, text="Select All", command=QuizzGenerator.selectAll)
+        QuizzGenerator.select_all.pack()
+
+        QuizzGenerator.select_all = tk.Button(self, text="Unselect All", command=QuizzGenerator.unselectAll)
+        QuizzGenerator.select_all.pack()
+
+        QuizzGenerator.selectedLabel = tk.Label(self, text="Selected items to be quizzed on")
+        QuizzGenerator.selectedLabel.pack()
+        QuizzGenerator.selectedList = tk.Listbox(self, height=7)
+        i = 1
+        for element in QuizzGenerator.selected:
+            QuizzGenerator.selectedList.insert(tk.END, str(i)+". "+element.toString())
+            i+=1
+        QuizzGenerator.selectedList.pack(fill=tk.X)
+
+        QuizzGenerator.unselectedLabel = tk.Label(self, text="Unselected items to be quizzed on")
+        QuizzGenerator.unselectedLabel.pack()
+        QuizzGenerator.unselectedList = tk.Listbox(self, height=7)
+        QuizzGenerator.unselectedList.pack(fill=tk.X)
+
+        QuizzGenerator.question = tk.StringVar()
+        QuizzGenerator.answers = tk.StringVar()
+
+        QuizzGenerator.questionLabel = tk.Label(self, text="Question Element")
+        QuizzGenerator.questionLabel.pack()
+        if quizzType == "kanjis":
+            QuizzGenerator.kanji_rb = tk.Radiobutton(self, text="Kanji", variable=QuizzGenerator.question, value="kanji")
+            QuizzGenerator.meaning_rb = tk.Radiobutton(self, text="Meaning", variable=QuizzGenerator.question, value="meaning")
+            QuizzGenerator.kunyomi_rb = tk.Radiobutton(self, text="Kunyomi", variable=QuizzGenerator.question, value="kunyomi")
+            QuizzGenerator.onyomi_rb = tk.Radiobutton(self, text="Onyomi", variable=QuizzGenerator.question, value="onyomi")
+            QuizzGenerator.kanji_rb.pack()
+            QuizzGenerator.meaning_rb.pack()
+            QuizzGenerator.kunyomi_rb.pack()
+            QuizzGenerator.onyomi_rb.pack()
+        elif quizzType == "words":
+            QuizzGenerator.word_rb = tk.Radiobutton(self, text="Word", variable=QuizzGenerator.question, value="word")
+            QuizzGenerator.reading_rb = tk.Radiobutton(self, text="Reading", variable=QuizzGenerator.question, value="reading")
+            QuizzGenerator.def_rb = tk.Radiobutton(self, text="Definition", variable=QuizzGenerator.question, value="def")
+            QuizzGenerator.word_rb.pack()
+            QuizzGenerator.reading_rb.pack()
+            QuizzGenerator.def_rb.pack()
+        
+        QuizzGenerator.answeresLabel = tk.Label(self, text="Multiple Choices Answere Elements")
+        QuizzGenerator.answeresLabel.pack()
+
+        if quizzType == "kanjis":
+            QuizzGenerator.kanji_rb = tk.Radiobutton(self, text="Kanji", variable=QuizzGenerator.answers, value="kanji")
+            QuizzGenerator.meaning_rb = tk.Radiobutton(self, text="Meaning", variable=QuizzGenerator.answers, value="meaning")
+            QuizzGenerator.kunyomi_rb = tk.Radiobutton(self, text="Kunyomi", variable=QuizzGenerator.answers, value="kunyomi")
+            QuizzGenerator.onyomi_rb = tk.Radiobutton(self, text="Onyomi", variable=QuizzGenerator.answers, value="onyomi")
+            QuizzGenerator.kanji_rb.pack()
+            QuizzGenerator.meaning_rb.pack()
+            QuizzGenerator.kunyomi_rb.pack()
+            QuizzGenerator.onyomi_rb.pack()
+        elif quizzType == "words":
+            QuizzGenerator.word_rb = tk.Radiobutton(self, text="Word", variable=QuizzGenerator.answers, value="word")
+            QuizzGenerator.reading_rb = tk.Radiobutton(self, text="Reading", variable=QuizzGenerator.answers, value="reading")
+            QuizzGenerator.def_rb = tk.Radiobutton(self, text="Definition", variable=QuizzGenerator.answers, value="def")
+            QuizzGenerator.word_rb.pack()
+            QuizzGenerator.reading_rb.pack()
+            QuizzGenerator.def_rb.pack()
+        
+        QuizzGenerator.generateQuizz_button = tk.Button(self, text="Generate Quizz with current settings", command=QuizzGenerator.generateQuizz)
+        QuizzGenerator.generateQuizz_button.pack()
+
+    def refreshLists():
+        QuizzGenerator.selectedList.delete(0, tk.END)
+        i = 1
+        for element in QuizzGenerator.selected:
+            QuizzGenerator.selectedList.insert(tk.END, str(i)+". "+element.toString())
+            i+=1
+
+        QuizzGenerator.unselectedList.delete(0, tk.END)
+        i = 1
+        for element in QuizzGenerator.unselected:
+            QuizzGenerator.unselectedList.insert(tk.END, str(i)+". "+element.toString())
+            i+=1
+
+
+    def moveSelected():
+        if len(QuizzGenerator.selectedList.curselection()) != 0:
+            element = QuizzGenerator.selected[QuizzGenerator.selectedList.curselection()[0]]
+            del QuizzGenerator.selected[QuizzGenerator.selectedList.curselection()[0]]
+            QuizzGenerator.unselected.append(element)
+        elif len(QuizzGenerator.unselectedList.curselection()) != 0:
+            element = QuizzGenerator.unselected[QuizzGenerator.unselectedList.curselection()[0]]
+            del QuizzGenerator.unselected[QuizzGenerator.unselectedList.curselection()[0]]
+            QuizzGenerator.selected.append(element)
+        QuizzGenerator.refreshLists()
+
+    def selectAll():
+        QuizzGenerator.selected += QuizzGenerator.unselected
+        QuizzGenerator.unselected.clear()
+        QuizzGenerator.refreshLists()
+
+
+    def unselectAll():
+        QuizzGenerator.unselected += QuizzGenerator.selected
+        QuizzGenerator.selected.clear()
+        QuizzGenerator.refreshLists()
+
+    def generateQuizz():
+        quizzType = QuizzGenerator.quizz_type
+        question = str(QuizzGenerator.question.get())
+        answeres = str(QuizzGenerator.answers.get())
+
+        print(quizzType)
+        print(question)
+        print(answeres)
+
+
+# Modify an existing bank of Kanjis or Words
+class BankModifier(tk.Toplevel):
+    def __init__(self):
+        tk.Toplevel.__init__(self)
+        self.geometry('350x75')
+        self.title("Change an existing Bank")
+
+        BankModifier.choseFile_button = tk.Button(self, text="Open a file to change (kanjis or words)", command=BankModifier.openFile)
+        BankModifier.choseFile_button.pack(pady=25)
+
+    def openFile():
+        fileName = tk.filedialog.askopenfilename()
+        if fileName:
+            print(fileName)
+
+
+
+
 def saveBank(elemType):
     elements = []
     
     if elemType == "kanjis":
         for kanji in kanjiBank:
             elements.append({kanji.kanji:{"Meanings":kanji.getMeanings(), "Kunyomi":kanji.getKunr(), "Onyomi":kanji.getOnr()}})
+            KanjiBank.clearAll()
 
     elif elemType == "words":
         for word in wordBank:
             elements.append({word.word:{"Reading":word.reading, "Definition":word.definition}})
+            WordBank.clearAll()
 
     json_save = {elemType:elements}
 
@@ -212,21 +433,12 @@ def saveBank(elemType):
 
 ################################ QUIZZ related ############################
 def generateNewQuizz(quizzType):
+    QuizzFileSelection(quizzType)
     print("Generating new quizz   "+quizzType)
     '''
-    Will open a new window that is identical for both, where user can select from 
-    fileS to be tested. It can also delete an oppend file,clear all files like the Banks
-    Then depending on the type selected, it will have to check if the quizzType 
-    is the same as the file type selected, cannot have kanji and words at the same time
-    
-    Once all the wanted files selected, he will press a button that open another window that 
-    will display all the elements he will be tested on, they will all be checked by default.
-    Buttons(selecteAll, deselectAll, generateQuizz)
-    He will have to choose which is the question (one of the attributes) and selected what
-    the multiple choices will be (another attribute of the element)
     He will press a button GenerateQuizz and it will open an html page with the quizz that will 
     validate it. Everytime he presses the GenerateQuizz button another random quizz will be generated
-    on the Webpage. User will validate in Webpage and will have possibility to save it in PDF.
+    on the Webpage.
     '''
 
 ################################ KANJI bank related ############################
@@ -269,12 +481,8 @@ def addWordToList():
     WordBank.refreshWordBankHolder()
 ############################ END WORD bank related #############################
 
-
-def createNewElemBank():
-    print("New elems bank")
-
 def modifyBank():
-    print("modify bank")
+    BankModifier()
 
 
 
