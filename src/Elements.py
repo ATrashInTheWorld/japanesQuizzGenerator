@@ -36,14 +36,13 @@ class Word(Element):
     def getDefinition(self):
         return self.definition
 
-    def setWord(self, word):
-        self.word = word
-
-    def setReading(self, Reading):
-        self.reading = reading
-
-    def setDefinition(self, definition):
-        self.definition = definition
+    def getAttr(self,attr):
+        if attr == "word":
+            return self.word
+        elif attr == "reading":
+            return self.reading
+        elif attr == "definition":
+            return self.definition
 
     def toString(self):
         wordVals = self.word+"   Reading: "+self.reading+"   Definition: "+self.definition
@@ -72,14 +71,15 @@ class Kanji(Element):
     def getKunr(self):
         return self.kunr.split(';')
 
-    def setKanji(self, kanji):
-        self.kanji = kanji
-
-    def setOnr(self, onr):
-        self.onr = onr
-
-    def setKunr(self, kunr):
-        self.kunr = kunr
+    def getAttr(self, attr):
+        if attr == "kanji":
+            return self.kanji
+        elif attr == "meanings":
+            return self.meanings
+        elif attr == "onr":
+            return self.onr
+        elif attr == "kunr":
+            return self.kunr
     
     def toString(self):
         kanjiVals = self.kanji+"   Meaning: "

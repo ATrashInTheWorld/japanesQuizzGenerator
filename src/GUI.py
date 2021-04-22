@@ -2,6 +2,10 @@ import tkinter as tk
 import tkinter.filedialog
 import Elements as elems
 import json
+import webbrowser as web
+from os import getcwd
+from bs4 import BeautifulSoup as bs4
+import random
 
 
 ### GLOBAL VARS
@@ -197,8 +201,8 @@ class QuizzFileSelection(tk.Toplevel):
         self.title("Quizz Files Selection")
 
         #TODO Remove and empty this list
-        # QuizzFileSelection.files_list = ["/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta2.json"]
-        QuizzFileSelection.files_list = []
+        QuizzFileSelection.files_list = ["/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta2.json"]
+        #QuizzFileSelection.files_list = []
         QuizzFileSelection.quizz_type = quizzType
 
         warning_label = tk.Label(self, text="Words and Kanji bank cannot be mixed.\nThe fille will be added, but the content will not be included.")
@@ -327,9 +331,9 @@ class QuizzGenerator(tk.Toplevel):
 
         if quizzType == "kanjis":
             QuizzGenerator.kanji_rb = tk.Radiobutton(self, text="Kanji", variable=QuizzGenerator.answers, value="kanji")
-            QuizzGenerator.meaning_rb = tk.Radiobutton(self, text="Meaning", variable=QuizzGenerator.answers, value="meaning")
-            QuizzGenerator.kunyomi_rb = tk.Radiobutton(self, text="Kunyomi", variable=QuizzGenerator.answers, value="kunyomi")
-            QuizzGenerator.onyomi_rb = tk.Radiobutton(self, text="Onyomi", variable=QuizzGenerator.answers, value="onyomi")
+            QuizzGenerator.meaning_rb = tk.Radiobutton(self, text="Meaning", variable=QuizzGenerator.answers, value="meanings")
+            QuizzGenerator.kunyomi_rb = tk.Radiobutton(self, text="Kunyomi", variable=QuizzGenerator.answers, value="kunr")
+            QuizzGenerator.onyomi_rb = tk.Radiobutton(self, text="Onyomi", variable=QuizzGenerator.answers, value="onr")
             QuizzGenerator.kanji_rb.pack()
             QuizzGenerator.meaning_rb.pack()
             QuizzGenerator.kunyomi_rb.pack()
@@ -337,7 +341,7 @@ class QuizzGenerator(tk.Toplevel):
         elif quizzType == "words":
             QuizzGenerator.word_rb = tk.Radiobutton(self, text="Word", variable=QuizzGenerator.answers, value="word")
             QuizzGenerator.reading_rb = tk.Radiobutton(self, text="Reading", variable=QuizzGenerator.answers, value="reading")
-            QuizzGenerator.def_rb = tk.Radiobutton(self, text="Definition", variable=QuizzGenerator.answers, value="def")
+            QuizzGenerator.def_rb = tk.Radiobutton(self, text="Definition", variable=QuizzGenerator.answers, value="definition")
             QuizzGenerator.word_rb.pack()
             QuizzGenerator.reading_rb.pack()
             QuizzGenerator.def_rb.pack()
@@ -381,14 +385,73 @@ class QuizzGenerator(tk.Toplevel):
         QuizzGenerator.selected.clear()
         QuizzGenerator.refreshLists()
 
+
     def generateQuizz():
         quizzType = QuizzGenerator.quizz_type
         question = str(QuizzGenerator.question.get())
-        answeres = str(QuizzGenerator.answers.get())
+        answers = str(QuizzGenerator.answers.get())
+        answersElement = []
 
-        print(quizzType)
-        print(question)
-        print(answeres)
+        if question != None and answers != None:
+            quizzPage = open(getcwd()+"/src/web/quizzPage.html", 'r')
+            soup = bs4(quizzPage.read(), 'html.parser')
+
+            questionsHtml = QuizzGenerator.generateHtmlQuestions(QuizzGenerator.selected, question, answers)
+            questionsDiv = soup.find(id="questions")
+            questionsDiv.clear()
+            questionsDiv.append(bs4(questionsHtml, 'html.parser'))
+
+            with open(getcwd()+"/src/web/quizzPage.html", 'w') as quizzFilePage:
+                quizzFilePage.write(str(soup))
+
+            web.open('file://'+getcwd()+"/src/web/quizzPage.html")
+
+
+    def generateHtmlQuestions(elements, question, answers):
+        scrambledElements = QuizzGenerator.shuffleList(elements)
+
+        htmlTxt = ""
+        if len(elements) > 4:
+            i = 1
+            for element in scrambledElements:
+                randomAns = [element]
+                while len(randomAns) != 4:
+                    extraAns = elements[random.randint(0,len(elements)-1)]
+                    if extraAns not in randomAns and extraAns.getAttr(answers)!=element.getAttr(answers):
+                        randomAns.append(extraAns)
+                
+                randomPositions = QuizzGenerator.shuffleList([0,1,2,3])
+
+                htmlTxt += "<p>"+str(i)+". "+element.getAttr(question)+"<br>"
+                for position in randomPositions:
+                    qNumber = str(i)
+                    answValue = randomAns[position].getAttr(answers)
+                    htmlTxt += "<input type='radio' name='q"+qNumber+"' value='"+answValue+"' id='"+qNumber+"-"+answValue+"'>"
+                    htmlTxt += "<label for='"+qNumber+"-"+answValue+"'>"+answValue+"</label> &nbsp &nbsp"
+
+                htmlTxt += "</p>"
+                i +=1
+
+            answersElement = []
+            for element in scrambledElements:
+                answersElement.append(element.getAttr(answers))
+            htmlTxt += "<input type='hidden' value='"+'---'.join(answersElement)+"'>"
+            htmlTxt += "<input type='hidden' value='"+str(i)+"'>"
+        
+        else:
+            htmlTxt += "<p>Need at least 5 elements in your selected list or bank </p>"
+
+        print()
+
+        return htmlTxt
+
+
+    def shuffleList(elemList):
+        shuffle = elemList[:]
+        random.shuffle(shuffle)
+        return shuffle
+
+
 
 
 # Modify an existing bank of Kanjis or Words
@@ -404,8 +467,25 @@ class BankModifier(tk.Toplevel):
     def openFile():
         fileName = tk.filedialog.askopenfilename()
         if fileName:
-            print(fileName)
+            data = json.load(open(fileName, encoding='utf8'))
+            fileType = list(data.keys())[0]
 
+            if fileType == "kanjis":
+                kanjiBank.clear()
+                for element in data[fileType]:
+                    kanji = list(element.keys())[0]
+                    meanings = ';'.join(element[kanji]["Meanings"])
+                    kunyomi = ';'.join(element[kanji]["Kunyomi"])
+                    onyomi = ';'.join(element[kanji]["Onyomi"])
+                    kanjiBank.append(elems.Kanji(kanji, meanings, kunyomi, onyomi))
+                KanjiBank()
+
+            elif fileType == "words":
+                wordBank.clear()
+                for element in data[fileType]:
+                    word = list(element.keys())[0]
+                    wordBank.append(elems.Word(word, element[word]["Reading"], element[word]["Definition"]))
+                WordBank()
 
 
 
@@ -431,15 +511,8 @@ def saveBank(elemType):
 
 
 
-################################ QUIZZ related ############################
 def generateNewQuizz(quizzType):
     QuizzFileSelection(quizzType)
-    print("Generating new quizz   "+quizzType)
-    '''
-    He will press a button GenerateQuizz and it will open an html page with the quizz that will 
-    validate it. Everytime he presses the GenerateQuizz button another random quizz will be generated
-    on the Webpage.
-    '''
 
 ################################ KANJI bank related ############################
 def createNewKanjiBank():
