@@ -1,23 +1,69 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-    <style>
-        #answersHolder{display:none;}
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+<style>
+        .hideAnswers{display:none;}
+        .wrongAnswer{color:red}
     </style>
 </head>
 <body>
-
 <h1>Quizz</h1>
 <div id="questionsHolder">
-    <div id="questions">
-        
-    </div>
-    <button id="validate">Validate Answers</button> 
-    <button id="displayAnswers">Display Answeres</button> 
-    <input type="hidden" id="answers" value="">
+<div id="questions">
+    <!--Here will be the questions-->
 </div>
-<div id="answersHolder">
-    <h2>Answers</h2>
+<button id="validate" onclick="validate()">Validate Answers</button>
+<p id="score"></p>
+<button id="displayAnswers" onclick="showAnswers()">Display Answeres</button>
 </div>
+<div class="hideAnswers" id="answersHolder">
+</div>
+<script>
+    function validate(){
+        var scorePara = document.getElementById("score");
+        var total = document.getElementById("totalQuestions").value;
+        var answersList = document.getElementById("answersList").value.split("---");
+        var score = 0;
+
+        for(var i = 1; i<=total; i++){
+            var answers = document.getElementsByName("q"+i);
+            var correct = false;
+            for(var j = 0; j<answers.length; j++){
+                if(answers[j].checked == true && answersList[i-1]== answers[j].value){
+                    correct=true;
+                    score++;
+                    break;
+                }
+            }
+            if(!correct){
+                document.getElementById("pq"+i).className="wrongAnswer";
+            }
+            else if(correct && document.getElementById("pq"+i).className=="wrongAnswer" ){
+                document.getElementById("pq"+i).className=""
+            }
+        }
+
+        scorePara.innerHTML = "<h4>"+score+"/"+total+"</h4>"
+    }
+
+    function showAnswers(){
+        var answersDiv = document.getElementById("answersHolder")
+        console.log(answersDiv.className)
+        if(answersDiv.className == "hideAnswers"){
+            var answersList = document.getElementById("answersList").value.split("---");
+            var htmlToAppend = "<h2>Answers</h2>";
+            for(var i = 1; i<=answersList.length; i++){
+                htmlToAppend += "<p>"+i+". "+answersList[i-1]+" </p>";
+            }
+            answersDiv.innerHTML = htmlToAppend;
+            answersDiv.className = "";
+        }
+        else if(answersDiv.className == ""){
+            answersDiv.className = "hideAnswers";
+        }
+    }
+</script>
 </body>
 </html> 

@@ -311,9 +311,9 @@ class QuizzGenerator(tk.Toplevel):
         QuizzGenerator.questionLabel.pack()
         if quizzType == "kanjis":
             QuizzGenerator.kanji_rb = tk.Radiobutton(self, text="Kanji", variable=QuizzGenerator.question, value="kanji")
-            QuizzGenerator.meaning_rb = tk.Radiobutton(self, text="Meaning", variable=QuizzGenerator.question, value="meaning")
-            QuizzGenerator.kunyomi_rb = tk.Radiobutton(self, text="Kunyomi", variable=QuizzGenerator.question, value="kunyomi")
-            QuizzGenerator.onyomi_rb = tk.Radiobutton(self, text="Onyomi", variable=QuizzGenerator.question, value="onyomi")
+            QuizzGenerator.meaning_rb = tk.Radiobutton(self, text="Meaning", variable=QuizzGenerator.question, value="meanings")
+            QuizzGenerator.kunyomi_rb = tk.Radiobutton(self, text="Kunyomi", variable=QuizzGenerator.question, value="kunr")
+            QuizzGenerator.onyomi_rb = tk.Radiobutton(self, text="Onyomi", variable=QuizzGenerator.question, value="onr")
             QuizzGenerator.kanji_rb.pack()
             QuizzGenerator.meaning_rb.pack()
             QuizzGenerator.kunyomi_rb.pack()
@@ -321,7 +321,7 @@ class QuizzGenerator(tk.Toplevel):
         elif quizzType == "words":
             QuizzGenerator.word_rb = tk.Radiobutton(self, text="Word", variable=QuizzGenerator.question, value="word")
             QuizzGenerator.reading_rb = tk.Radiobutton(self, text="Reading", variable=QuizzGenerator.question, value="reading")
-            QuizzGenerator.def_rb = tk.Radiobutton(self, text="Definition", variable=QuizzGenerator.question, value="def")
+            QuizzGenerator.def_rb = tk.Radiobutton(self, text="Definition", variable=QuizzGenerator.question, value="definition")
             QuizzGenerator.word_rb.pack()
             QuizzGenerator.reading_rb.pack()
             QuizzGenerator.def_rb.pack()
@@ -417,8 +417,6 @@ class QuizzGenerator(tk.Toplevel):
                 randomAns = [element]
                 while len(randomAns) != 4:
                     extraAns = elements[random.randint(0,len(elements)-1)]
-                    #### REDO ADD, like check that ALL THE CURRENT ANSWERES ARE DIFFERENT
-                    ### ALSO, GET ANSWERES FROM UNSELECTED ITEMS TOO IN ORDER TO HAVE MORE MULTIPLE ANSWERES POSSIBLE
                     if extraAns not in randomAns and extraAns.getAttr(answers)!=element.getAttr(answers):
                         randomAns.append(extraAns)
                 
