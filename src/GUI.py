@@ -201,8 +201,8 @@ class QuizzFileSelection(tk.Toplevel):
         self.title("Quizz Files Selection")
 
         #TODO Remove and empty this list
-        QuizzFileSelection.files_list = ["/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta2.json"]
-        #QuizzFileSelection.files_list = []
+        #QuizzFileSelection.files_list = ["/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta.json","/home/dragonbug/Documents/Trashes/beta2.json"]
+        QuizzFileSelection.files_list = []
         QuizzFileSelection.quizz_type = quizzType
 
         warning_label = tk.Label(self, text="Words and Kanji bank cannot be mixed.\nThe fille will be added, but the content will not be included.")
@@ -418,6 +418,7 @@ class QuizzGenerator(tk.Toplevel):
                 while len(randomAns) != 4:
                     extraAns = elements[random.randint(0,len(elements)-1)]
                     #### REDO ADD, like check that ALL THE CURRENT ANSWERES ARE DIFFERENT
+                    ### ALSO, GET ANSWERES FROM UNSELECTED ITEMS TOO IN ORDER TO HAVE MORE MULTIPLE ANSWERES POSSIBLE
                     if extraAns not in randomAns and extraAns.getAttr(answers)!=element.getAttr(answers):
                         randomAns.append(extraAns)
                 
@@ -496,20 +497,18 @@ def saveBank(elemType):
     if elemType == "kanjis":
         for kanji in kanjiBank:
             elements.append({kanji.kanji:{"Meanings":kanji.getMeanings(), "Kunyomi":kanji.getKunr(), "Onyomi":kanji.getOnr()}})
-            KanjiBank.clearAll()
 
     elif elemType == "words":
         for word in wordBank:
             elements.append({word.word:{"Reading":word.reading, "Definition":word.definition}})
-            WordBank.clearAll()
 
     json_save = {elemType:elements}
+    # print(json_save)
 
     fileName = tk.filedialog.asksaveasfilename()
     if fileName:
         with open(fileName, 'w', encoding='utf8') as jsonFile:
             json.dump(json_save, jsonFile, indent=2, separators=(',',': '), ensure_ascii=False)
-
 
 
 def generateNewQuizz(quizzType):
