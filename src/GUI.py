@@ -417,12 +417,13 @@ class QuizzGenerator(tk.Toplevel):
                 randomAns = [element]
                 while len(randomAns) != 4:
                     extraAns = elements[random.randint(0,len(elements)-1)]
+                    #### REDO ADD, like check that ALL THE CURRENT ANSWERES ARE DIFFERENT
                     if extraAns not in randomAns and extraAns.getAttr(answers)!=element.getAttr(answers):
                         randomAns.append(extraAns)
                 
                 randomPositions = QuizzGenerator.shuffleList([0,1,2,3])
 
-                htmlTxt += "<p>"+str(i)+". "+element.getAttr(question)+"<br>"
+                htmlTxt += "<p id='pq"+str(i)+"'>"+str(i)+". "+element.getAttr(question)+"<br>"
                 for position in randomPositions:
                     qNumber = str(i)
                     answValue = randomAns[position].getAttr(answers)
@@ -435,8 +436,8 @@ class QuizzGenerator(tk.Toplevel):
             answersElement = []
             for element in scrambledElements:
                 answersElement.append(element.getAttr(answers))
-            htmlTxt += "<input type='hidden' value='"+'---'.join(answersElement)+"'>"
-            htmlTxt += "<input type='hidden' value='"+str(i)+"'>"
+            htmlTxt += "<input type='hidden' id='answersList' value='"+'---'.join(answersElement)+"'>"
+            htmlTxt += "<input type='hidden' id='totalQuestions'  value='"+str(i-1)+"'>"
         
         else:
             htmlTxt += "<p>Need at least 5 elements in your selected list or bank </p>"
