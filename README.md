@@ -39,7 +39,7 @@ python3.6 src/GUI.py
 Navigate to directory where you downloaded the project and double click on GUI.py
 
 
-# Manual
+# Manual and limitations
 I am kind of lazy to write that part and the UI should be intuitive enough.
 
 However, here some tips:
@@ -53,6 +53,8 @@ However, here some tips:
 - This application, unfortunately, opens multiple tabs, therefore if you wish to close all of them at once, just close the main tab (the first one you will see).
 
 - If by any reason the quizzPage.html gets its content erased, just copy the one from quizzPage.copy.html
+
+- !!! Do not use words with " ' " such as "don't", "musn't"..., they will break the webpage and the quiz will no longer work properly !!! 
 
 
 # Bugs and problems:

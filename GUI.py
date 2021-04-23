@@ -423,7 +423,7 @@ class QuizzGenerator(tk.Toplevel):
                 
                 randomPositions = QuizzGenerator.shuffleList([0,1,2,3])
 
-                htmlTxt += "<p id='pq"+str(i)+"'>"+str(i)+". "+element.getAttr(question)+"<br>"
+                htmlTxt += "<p class='questionPara' id='pq"+str(i)+"'>"+str(i)+". "+element.getAttr(question)+"<br>"
                 for position in randomPositions:
                     qNumber = str(i)
                     answValue = randomAns[position].getAttr(answers)
