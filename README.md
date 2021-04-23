@@ -4,20 +4,34 @@ With this app, you create kanji and word banks that you can save. From those ban
 # What you need:
 - python 3.6
 - pip3
-- Tkinte
+- Tkinter
 - bs4
 
 # Instalation process
-## Linux
-Install pip3: sudo apt-get install python3-pip
-Install appJar: pip3 install appjar
-sudo apt-get install python3-tk 
-Install Tkinter: pip3 install tk
+## Linux (Ubuntu 18)
+```bash
+sudo apt-get install python3.6
+sudo apt install python3-pip
+sudo apt-get install python3.6-tk
 pip3 install bs4
+```
 
 ## Windows (10)
 
-## Mac
+
+
+
+# How to start the app:
+## Linux (Ubuntu 18):
+```bash
+# Move to the app directory and run
+python3.6 src/GUI.py
+# A window should appear with some options
+```
+
+## Windows (10)
+1. Install python3.6 from official release (https://www.python.org/downloads/release/python-366/)
+
 
 # Manual
 I am kind of lazy to write that part and the UI should be intuitive enough.
@@ -27,6 +41,7 @@ However, here some tips:
 - Just like your school projects, save your bank regulary. We never know when the program can bug.
 - Since the files are JSON, you should be able to modify them directly and even create some, just follow a temple after saving a random bank.
 - Small detail: When a kanji has multiple meanings, for example, it is asked to divide them with a ';'. However, for some reason the American keyboard ';' is different from the Japanese keyboard '；', therefore the meanings would not be properly divided in the JSON file. This detail doesn't interfere with the application or the quizzes.
+- This application, unfortunately, opens multiple tabs, therefore if you wish to close all of them at once, just close the main tab (the first one you will see).
 
 
 # Bugs and problems:

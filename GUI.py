@@ -3,7 +3,8 @@ import tkinter.filedialog
 import Elements as elems
 import json
 import webbrowser as web
-from os import getcwd
+# from os import getcwd
+from os import path
 from bs4 import BeautifulSoup as bs4
 import random
 
@@ -393,7 +394,7 @@ class QuizzGenerator(tk.Toplevel):
         answersElement = []
 
         if question != None and answers != None:
-            quizzPage = open(getcwd()+"/src/web/quizzPage.html", 'r')
+            quizzPage = open(path.abspath("quizzPage.html"), 'r')
             soup = bs4(quizzPage.read(), 'html.parser')
 
             questionsHtml = QuizzGenerator.generateHtmlQuestions(QuizzGenerator.selected, question, answers)
@@ -401,10 +402,10 @@ class QuizzGenerator(tk.Toplevel):
             questionsDiv.clear()
             questionsDiv.append(bs4(questionsHtml, 'html.parser'))
 
-            with open(getcwd()+"/src/web/quizzPage.html", 'w') as quizzFilePage:
+            with open(path.abspath("quizzPage.html"), 'w') as quizzFilePage:
                 quizzFilePage.write(str(soup))
 
-            web.open('file://'+getcwd()+"/src/web/quizzPage.html")
+            web.open('file://'+path.abspath("quizzPage.html"))
 
 
     def generateHtmlQuestions(elements, question, answers):
