@@ -394,7 +394,7 @@ class QuizzGenerator(tk.Toplevel):
         answersElement = []
 
         if question != None and answers != None:
-            quizzPage = open(path.abspath("quizzPage.html"), 'r')
+            quizzPage = open(path.abspath("quizzPage.html"), 'r', encoding='utf-8', errors='ignore')
             soup = bs4(quizzPage.read(), 'html.parser')
 
             questionsHtml = QuizzGenerator.generateHtmlQuestions(QuizzGenerator.selected, question, answers)
@@ -402,7 +402,7 @@ class QuizzGenerator(tk.Toplevel):
             questionsDiv.clear()
             questionsDiv.append(bs4(questionsHtml, 'html.parser'))
 
-            with open(path.abspath("quizzPage.html"), 'w') as quizzFilePage:
+            with open(path.abspath("quizzPage.html"), 'w', encoding='utf-8', errors='ignore') as quizzFilePage:
                 quizzFilePage.write(str(soup))
 
             web.open('file://'+path.abspath("quizzPage.html"))
@@ -423,6 +423,7 @@ class QuizzGenerator(tk.Toplevel):
                 
                 randomPositions = QuizzGenerator.shuffleList([0,1,2,3])
 
+                print(element.getAttr(question))
                 htmlTxt += "<p id='pq"+str(i)+"'>"+str(i)+". "+element.getAttr(question)+"<br>"
                 for position in randomPositions:
                     qNumber = str(i)
