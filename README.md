@@ -17,7 +17,13 @@ pip3 install bs4
 ```
 
 ## Windows (10)
-
+1. Install python3.6 from official release (https://www.python.org/downloads/release/python-366/)
+2. In a 'cmd' type the following commands:
+```bash
+#Upgrade just in case your pip, if another command is suggested to be run, run that one
+pip install --upgrad pip
+pip install bs4
+```
 
 
 
@@ -30,7 +36,7 @@ python3.6 src/GUI.py
 ```
 
 ## Windows (10)
-1. Install python3.6 from official release (https://www.python.org/downloads/release/python-366/)
+Navigate to directory where you downloaded the project and double click on GUI.py
 
 
 # Manual
@@ -39,9 +45,14 @@ I am kind of lazy to write that part and the UI should be intuitive enough.
 However, here some tips:
 
 - Just like your school projects, save your bank regulary. We never know when the program can bug.
+
 - Since the files are JSON, you should be able to modify them directly and even create some, just follow a temple after saving a random bank.
+
 - Small detail: When a kanji has multiple meanings, for example, it is asked to divide them with a ';'. However, for some reason the American keyboard ';' is different from the Japanese keyboard '；', therefore the meanings would not be properly divided in the JSON file. This detail doesn't interfere with the application or the quizzes.
+
 - This application, unfortunately, opens multiple tabs, therefore if you wish to close all of them at once, just close the main tab (the first one you will see).
+
+- If by any reason the quizzPage.html gets its content erased, just copy the one from quizzPage.copy.html
 
 
 # Bugs and problems:
